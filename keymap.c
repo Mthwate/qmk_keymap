@@ -2,6 +2,14 @@
 
 enum ctrl_keycodes {
     MD_BOOT = SAFE_RANGE, // Restart into bootloader after hold timeout
+    TM_SH,
+    TM_SV,
+    TM_EXIT,
+    TM_MVU,
+    TM_MVD,
+    TM_MVL,
+    TM_MVR,
+    TM_ZOOM,
 };
 
 enum layers {
@@ -21,12 +29,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL,   KC_LGUI,   KC_LALT,                         KC_SPC,                                     KC_RALT,   MO(LO_FN), KC_APP,    KC_RCTL,              KC_LEFT,   KC_DOWN,   KC_RGHT    \
     ),
     [LO_FN] = LAYOUT(
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,              KC_MUTE,   _______,   _______,   \
-        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_MPLY,   KC_MSTP,   KC_VOLU,   \
-        _______,   RGB_SPD,   RGB_VAI,   RGB_SPI,   RGB_HUI,   RGB_SAI,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   KC_MPRV,   KC_MNXT,   KC_VOLD,   \
+        TM_EXIT,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,              KC_MUTE,   _______,   _______,   \
+        _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   TM_SH,     _______,   _______,   KC_MPLY,   KC_MSTP,   KC_VOLU,   \
+        _______,   RGB_SPD,   RGB_VAI,   RGB_SPI,   RGB_HUI,   RGB_SAI,   _______,   _______,   _______,   _______,   _______,   _______,   _______,   TM_SV,     KC_MPRV,   KC_MNXT,   KC_VOLD,   \
         _______,   RGB_RMOD,  RGB_VAD,   RGB_MOD,   RGB_HUD,   RGB_SAD,   _______,   _______,   _______,   _______,   _______,   _______,   _______,                                               \
-        _______,   RGB_TOG,   _______,   _______,   _______,   MD_BOOT,   NK_TOGG,   _______,   _______,   _______,   _______,   _______,                                    _______,              \
-        _______,   _______,   _______,                         _______,                                    _______,   _______,   _______,   _______,              _______,   _______,   _______    \
+        TM_ZOOM,   RGB_TOG,   _______,   _______,   _______,   MD_BOOT,   NK_TOGG,   _______,   _______,   _______,   _______,   _______,                                    TM_MVU,               \
+        _______,   _______,   _______,                         _______,                                    _______,   _______,   _______,   _______,              TM_MVL,    TM_MVD,    TM_MVR     \
     ),
 };
 
@@ -49,6 +57,46 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (timer_elapsed32(key_timer) >= 500) {
                     reset_keyboard();
                 }
+            }
+            return false;
+        case TM_SV:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) "%");
+            }
+            return false;
+        case TM_SH:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) "\"");
+            }
+            return false;
+        case TM_MVU:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) SS_TAP(X_UP));
+            }
+            return false;
+        case TM_MVD:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) SS_TAP(X_DOWN));
+            }
+            return false;
+        case TM_MVL:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) SS_TAP(X_LEFT));
+            }
+            return false;
+        case TM_MVR:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) SS_TAP(X_RIGHT));
+            }
+            return false;
+        case TM_EXIT:
+            if (record->event.pressed) {
+                SEND_STRING("exit" SS_TAP(X_ENTER));
+            }
+            return false;
+        case TM_ZOOM:
+            if (record->event.pressed) {
+                SEND_STRING(SS_DOWN(X_LCTRL) "b" SS_UP(X_LCTRL) "z");
             }
             return false;
         case RGB_TOG:
